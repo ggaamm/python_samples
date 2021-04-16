@@ -5,28 +5,31 @@ Created on Thu Apr 15 18:59:33 2021
 
 @author: gam
 """
-import itertools # import combinations
+#import itertools # import combinations
 import os
 from multiprocessing import Process
 import time
 import random 
-
+from itertools import combinations
 
     
-def doWork(perm):
+def doWork(all_perms, cpu_id, per_process_element_size):
     v = random.randint(2, 5)
-    print(f"workk {v} sec {os.getpid()}\n")
+    perm = all_perms[cpu_id * per_process_element_size: (cpu_id+1) * per_process_element_size]
+    print(f"workk {perm} id {cpu_id} per_process {per_process} {v} sec {os.getpid()}\n")
     time.sleep(v)
-    print("dowork done", os.getpid())
+    print(f"dowork done id {cpu_id}", os.getpid())
         
 
 if __name__=="__main__":
     
-   all_perms = itertools.combinations(range(7), 5)
+   all_perms = list(combinations(range(7), 5))
    process_list = []
-   print(os.cpu_count())
-   for i in range(os.cpu_count()-2):
-       p = Process(target=doWork, args=(all_perms,))
+   # per_process_element
+   per_process_element_size = len(all_perms) // (os.cpu_count() - 1)
+   print("per process", per_process)
+   for i in range(os.cpu_count()-1):
+       p = Process(target=doWork, args=(all_perms, i, per_process))
        process_list.append(p)
        p.start()
 
